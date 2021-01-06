@@ -17,12 +17,13 @@ namespace MCTS_Othello
         Bitmap whitePiece;
         Bitmap optionPiece;
         string botOne, botTwo;
+
         CancellationTokenSource cancelToken;
         delegate void uiUpdateDelegate(object token);
+
         public Form1()
         {
             InitializeComponent();
-            FormClosing += new FormClosingEventHandler(ReleaseResources);
             boardImage = (Bitmap)Image.FromFile("board.png");
             blackPiece = (Bitmap)Image.FromFile("black.png");
             whitePiece = (Bitmap)Image.FromFile("white.png");
@@ -232,6 +233,10 @@ namespace MCTS_Othello
             }
         }
 
+        /// <summary>
+        /// The function executed by a thread to update the UI.
+        /// </summary>
+        /// <param name="token"></param>
         private void UpdateUIAuto(object token)
         {
             Console.WriteLine("UI Update auto thread start.");
@@ -239,18 +244,32 @@ namespace MCTS_Othello
             while (game.IsFinished() == false && cancelToken.IsCancellationRequested == false)
             {
                 UpdateUI();
-                Thread.Sleep(500);
+                Thread.Sleep(50000);
             }
             UpdateUI();
             Console.WriteLine("UI Update thread exit.");
         }
 
+        /// <summary>
+        /// Launch a thread which will update the UI to show the updates from the bot player.
+        /// </summary>
         private void LaunchUpdateAuto()
         {
             cancelToken = new CancellationTokenSource();
             uiUpdateDelegate d = new uiUpdateDelegate(this.UpdateUIAuto);
             this.Invoke(d, new object[] { cancelToken });
         }
+
+        /// <summary>
+        /// Close the app button pressed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
         // de reparat functia asta.
         protected void ReleaseResources(object sender, FormClosingEventArgs e)
         {

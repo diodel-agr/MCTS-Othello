@@ -18,6 +18,7 @@ namespace MCTS_Othello.ui
             size = sz;
             pieces = new Piece[sz, sz];
         }
+
         public Board(Board b)
         {
             size = b.size;
@@ -39,16 +40,7 @@ namespace MCTS_Othello.ui
                 }
             }
         }
-        ~Board()
-        {
-            for (int i = 0; i < size; ++i)
-            {
-                for (int j = 0; j < size; ++j)
-                {
-                    pieces[i, j] = null;
-                }
-            }
-        }
+
         /* methods. */
         /**
          * AddPiece - adds a piece on the board.
@@ -81,6 +73,7 @@ namespace MCTS_Othello.ui
                 UpdateBoardDiagonal(src, dest);
             }
         }
+
         /**
          * UpdateBoardLine - after a horizontal / vertical move, switches the color
          * of the enemy's pieces that are affected by the move.
@@ -93,7 +86,7 @@ namespace MCTS_Othello.ui
             /* check src and dest owner. */
             if (src.owner != dest.owner)
             {
-                throw new MCTSException("Source and dest pieces doesn't have the same owner.");
+                throw new MCTSException("Source and dest pieces don't have the same owner.");
             }
             int i;
             int start, end;
@@ -128,6 +121,7 @@ namespace MCTS_Othello.ui
                 }
             }
         }
+
         /**
          * UpdateBoardDiagonal - after a diagonal move, switches the color
          * of the enemy's pieces that are affected by the move.
@@ -178,6 +172,7 @@ namespace MCTS_Othello.ui
                 UpdateBoardDiagonal(dest, src);
             }
         }
+
         /**
          * GetValidMoves - returns the posible positions for the next move.
          * 
@@ -209,6 +204,7 @@ namespace MCTS_Othello.ui
             if (res != null) options.Add(res);
             return options;
         }
+
         /**
          * GetValidMovesUp - returns a piece if it is posible to move on the up direction
          * or null if no up move is possible.
@@ -237,6 +233,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesDown - returns a piece if it is posible to move on the down direction
          * or null if no down move is possible.
@@ -265,6 +262,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesLeft - returns a piece if it is posible to move on the left direction
          * or null if no left move is possible.
@@ -293,6 +291,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesRight - returns a piece if it is posible to move on the right direction
          * or null if no right move is possible.
@@ -321,6 +320,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesCornerOne - returns a piece if it is posible to move on the up-right corner direction
          * or null if no move is possible.
@@ -352,6 +352,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesCornerTwo - returns a piece if it is posible to move on the up-left corner direction
          * or null if no move is possible.
@@ -383,6 +384,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesCornerThree - returns a piece if it is posible to move on the down-left corner direction
          * or null if no move is possible.
@@ -414,6 +416,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetValidMovesCornerFour - returns a piece if it is posible to move on the down-right corner direction
          * or null if no move is possible.
@@ -445,6 +448,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetPlayerPieces - returns the list of pieces of a certain player.
          * 
@@ -463,6 +467,7 @@ namespace MCTS_Othello.ui
             }
             return playerPieces;
         }
+
         /**
          * GetPieceNeighbors - this function finds the neighbors of a piece. 
          * 
@@ -495,6 +500,7 @@ namespace MCTS_Othello.ui
             if (res != null) neigh.Add(res);
             return neigh;
         }
+
         /**
          * GetLeftNeighbor - finds the neighbor on the left.
          * 
@@ -515,6 +521,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetRightNeighbor - finds the neighbor on the right.
          * 
@@ -535,6 +542,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetUpNeighbor - finds the neighbor from the up direction.
          * 
@@ -555,6 +563,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetDownNeighbor - finds the neighbor from the down direction.
          * 
@@ -575,6 +584,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetCornerOneNeighbor - finds the neighbor from the up-right direction.
          * 
@@ -597,6 +607,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetCornerTwoNeighbor - finds the neighbor from the up-left direction.
          * 
@@ -619,6 +630,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetCornerThreeNeighbor - finds the neighbor from the down-left direction.
          * 
@@ -641,6 +653,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetCornerFourNeighbor - finds the neighbor from the down-right direction.
          * 
@@ -663,6 +676,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * GetScore - returns players score.
          * 
@@ -685,6 +699,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * SetScore - sets the players score.
          * 
@@ -706,6 +721,7 @@ namespace MCTS_Othello.ui
 
             }
         }
+
         /**
          * IncPlayerScore - increments player score.
          * 
@@ -726,6 +742,7 @@ namespace MCTS_Othello.ui
                 throw new MCTSException("[Board/IncPlayerScore()] - players scores are invalid ( > 64).");
             }
         }
+
         /**
          * DecPlayerScore - decrements player score.
          * 
@@ -750,6 +767,7 @@ namespace MCTS_Othello.ui
                 }
             }
         }
+
         /**
          * IsFinished - returns true if the game is finished and false otherwise.
          * 
@@ -772,6 +790,7 @@ namespace MCTS_Othello.ui
             }
             return result;
         }
+
         /**
          * PlayerHasPossibleMoves - returns true if the current player has possible moves
          * and false otherwise.

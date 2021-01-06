@@ -5,6 +5,9 @@ using System;
 
 namespace MCTS_Othello.game
 {
+    /// <summary>
+    /// Enum which encodes the different states of a game.
+    /// </summary>
     enum GameState
     {
         stopped = 0,
@@ -12,6 +15,10 @@ namespace MCTS_Othello.game
         tileClicked = 2,
         waitBot = 3
     }
+
+    /// <summary>
+    /// Class which modelates a Human vs Human game.
+    /// </summary>
     class HHGame : IMCTSGame
     {
         /* members. */

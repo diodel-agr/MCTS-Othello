@@ -8,12 +8,18 @@ namespace MCTS_Othello.game
 {
     class HCGame : IMCTSGame
     {
+        /* static members. */
+        private static int BOT_WAIT_TIMEOUT = 500;
+
         /* members. */
         Board board;
         IMCTSPlayer player1;
         IMCTSPlayer bot;
         IMCTSPlayer currentPlayer;
         Piece clickedTile;
+        /// <summary>
+        /// List with the current valid moves for a clicked tile.
+        /// </summary>
         List<Piece> optionList;
         GameState state;
 
@@ -114,6 +120,7 @@ namespace MCTS_Othello.game
                     if (opt.X == x && opt.Y == y)
                     {
                         isInList = true;
+                        break;
                     }
                 }
                 if (isInList == true)
@@ -134,6 +141,7 @@ namespace MCTS_Othello.game
                     /* launch thread to get move from bot. */
                     Thread botThread = new Thread(new ThreadStart(BotThread));
                     botThread.Start();
+                    botThread.Join();
                 }
             }
         }
@@ -211,35 +219,38 @@ namespace MCTS_Othello.game
             return result;
         }
 
+        /// <summary>
+        /// Function executed by the bot thread.
+        /// </summary>
         private void BotThread()
         {
             //Console.WriteLine("Bot thread started.");
             /* do bot things. */
-            Thread.Sleep(1000); ////////////////////// sa faci sa fie configurabil.
+            Thread.Sleep(BOT_WAIT_TIMEOUT);
             /* get move from bot. */
             Piece piece = bot.MakeMove();
-            if (piece != null)
-            {
-                Console.WriteLine("Bot chose piece:" + piece.X + ": " + piece.Y);
-                board.AddPiece(piece);
-                List<Piece> neigh = board.GetPieceNeighbors(piece);
-                foreach (Piece n in neigh)
-                {
-                    board.AddPiece(piece, n);
-                }
-                //board.PrintBoard();
-                bot.SetBoard(board);
-                bot.Play();
-                GC.Collect();
-            }
-            else
+            if (piece == null)
             {
                 throw new MCTSException("[HCGame/PlayerClicked()] - Bot returned a null move.");
             }
+            Console.WriteLine("Bot chose piece:" + piece.X + ": " + piece.Y);
+            board.AddPiece(piece);
+            List<Piece> neigh = board.GetPieceNeighbors(piece);
+            foreach (Piece n in neigh)
+            {
+                board.AddPiece(piece, n);
+            }
+            //board.PrintBoard();
+            bot.SetBoard(board);
+            bot.Play();
+            // find a way to get rid of this ugly call to garbage collector.
+            GC.Collect();
             /* set next player. */
             currentPlayer = player1;
             /* set game state. */
             state = GameState.waitPlayer;
+            /* update ui. */
+            
         }
     }
 }
