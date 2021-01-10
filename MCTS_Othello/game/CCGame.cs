@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace MCTS_Othello.game
 {
-    class CCGame : IMCTSGame
+    class CCGame<T> : IMCTSGame<T>
     {
         /* members. */
         Board board;
@@ -239,6 +239,11 @@ namespace MCTS_Othello.game
             }
             state = GameState.stopped;
             Console.WriteLine("Game thread exit!");
+        }
+
+        public IDisposable Subscribe(IObserver<T> observer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

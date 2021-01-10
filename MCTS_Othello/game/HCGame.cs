@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace MCTS_Othello.game
 {
-    class HCGame : IMCTSGame
+    class HCGame<T> : IMCTSGame<T>
     {
         /* static members. */
         private static int BOT_WAIT_TIMEOUT = 500;
@@ -22,6 +22,8 @@ namespace MCTS_Othello.game
         /// </summary>
         List<Piece> optionList;
         GameState state;
+        /* The list of observers. */
+        private List<IObserver<T>> observers;
 
         /* constructors. */
         public HCGame()
@@ -31,7 +33,9 @@ namespace MCTS_Othello.game
             clickedTile = null;
             optionList = null;
             state = GameState.stopped;
+            observers = new List<IObserver<T>>();
         }
+
         public HCGame(string comp) : this()
         {
             player1 = new HumanPlayer(Color.black);
@@ -139,9 +143,9 @@ namespace MCTS_Othello.game
                     bot.SetBoard(board);
                     bot.Play(newPiece); /* newPiece is the piece placed by the human. */
                     /* launch thread to get move from bot. */
-                    Thread botThread = new Thread(new ThreadStart(BotThread));
-                    botThread.Start();
-                    botThread.Join();
+                    //Thread botThread = new Thread(new ThreadStart(BotThread));
+                    //botThread.Start();
+                    //botThread.Join();
                 }
             }
         }
@@ -250,7 +254,70 @@ namespace MCTS_Othello.game
             /* set game state. */
             state = GameState.waitPlayer;
             /* update ui. */
-            
+            T x = default(T);
+            Refresh(x);
+        }
+        /** Method for the IObservable interface. **/
+        /// <summary>
+        /// Method used by the observers to register to this observable.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns></returns>
+        public IDisposable Subscribe(IObserver<T> observer)
+        {
+            // add the observer to the observers list.
+            observers.Add(observer);
+            // start the thread to get the move from the bot and update the UI.
+            Thread botThread = new Thread(new ThreadStart(BotThread));
+            botThread.Start();
+            botThread.Join();
+            return new Unsubscriber<T>(observers, observer);
+        }
+        /// <summary>
+        /// Method used to call the 'UpdateUI' method.
+        /// </summary>
+        /// <param name="value"></param>
+        public void Refresh(T value)
+        {
+            foreach (var obs in observers)
+            {
+                obs.OnNext(value);
+            }
+        }
+        /// <summary>
+        /// Method used by the observers to unsubscribe from this observable.
+        /// </summary>
+        public void EndSubscription()
+        {
+            foreach (var observer in observers.ToArray())
+            {
+                if (observers.Contains(observer))
+                {
+                    observer.OnCompleted();
+                }
+            }
+            observers.Clear();
+        }
+        /// <summary>
+        /// IDisposable object returned to the Observer (Form).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private class Unsubscriber<T> : IDisposable
+        {
+            private List<IObserver<T>> _observers;
+            private IObserver<T> _observer;
+
+            public Unsubscriber(List<IObserver<T>> observers, IObserver<T> observer)
+            {
+                this._observers = observers;
+                this._observer = observer;
+            }
+
+            public void Dispose()
+            {
+                if (_observer != null && _observers.Contains(_observer))
+                    _observers.Remove(_observer);
+            }
         }
     }
 }

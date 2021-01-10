@@ -58,6 +58,7 @@
     <Compile Include="game\IMCTSGame.cs" />
     <Compile Include="MCTSException.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="ObserverPattern\Observers\IObserver.cs" />
     <Compile Include="player\HumanPlayer.cs" />
     <Compile Include="player\IMCTSPlayer.cs" />
     <Compile Include="player\MCTSPlayer.cs" />

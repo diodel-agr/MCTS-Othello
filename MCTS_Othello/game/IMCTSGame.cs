@@ -13,7 +13,7 @@ namespace MCTS_Othello.game
      * There are 3 types of games: computer vs computer, human vs computer and
      * human vs human. The game will be selected before the start of game.
      */
-    interface IMCTSGame
+    interface IMCTSGame<T> : IObservable<T>
     {
         void Start();
         void InitBoard();

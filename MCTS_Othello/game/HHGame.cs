@@ -19,7 +19,7 @@ namespace MCTS_Othello.game
     /// <summary>
     /// Class which modelates a Human vs Human game.
     /// </summary>
-    class HHGame : IMCTSGame
+    class HHGame<T> : IMCTSGame<T>
     {
         /* members. */
         Board board;
@@ -197,6 +197,11 @@ namespace MCTS_Othello.game
                 result = loser.ToString() + " cannot do any moves! " + winner.ToString() + " won the game!";
             }
             return result;
+        }
+
+        public IDisposable Subscribe(IObserver<T> observer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

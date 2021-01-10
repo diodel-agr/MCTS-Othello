@@ -9,14 +9,16 @@ using System.Windows.Forms;
 //https://project.dke.maastrichtuniversity.nl/games/files/phd/Chaslot_thesis.pdf
 namespace MCTS_Othello
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form, IObserver<int>
     {
-        IMCTSGame game;
+        IMCTSGame<int> game;
         Bitmap boardImage;
         Bitmap blackPiece;
         Bitmap whitePiece;
         Bitmap optionPiece;
         string botOne, botTwo;
+        // Object used for observing the board update.
+        IDisposable unsubscriber;
 
         CancellationTokenSource cancelToken;
         delegate void uiUpdateDelegate(object token);
@@ -46,20 +48,20 @@ namespace MCTS_Othello
             switch (gameIdx)
             {
                 case 0: // "Human vs. Human":
-                    game = new HHGame();
+                    game = new HHGame<int>();
                     break;
                 case 1: // "Human vs. Computer":
-                    game = new HCGame(botOne);
+                    game = new HCGame<int>(botOne);
                     break;
                 case 2: // "Computer vs. Computer":
-                    game = new CCGame(botOne, botTwo);
+                    game = new CCGame<int>(botOne, botTwo);
                     break;
             }
             game.Start();
             
             pictureBox.Size = boardImage.Size;
             pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
-            Type a = game.GetType(), b = typeof(HHGame), c = typeof(HCGame);
+            Type a = game.GetType(), b = typeof(HHGame<int>), c = typeof(HCGame<int>);
             if (a.Equals(c) == true)
             {
                 pictureBox.MouseUp += new MouseEventHandler(this.pictureBox_MouseUp);
@@ -122,6 +124,9 @@ namespace MCTS_Othello
             if (cursorX >= 0 && cursorY >= 0)
             {
                 game.PlayerClicked(cursorX, cursorY);
+                game.Subscribe(this);
+                uiUpdateDelegate d = new uiUpdateDelegate(game);
+                this.Invoke(d, new object[] { cancelToken });
             }
             else
             {
@@ -232,7 +237,6 @@ namespace MCTS_Othello
                 restartButton.Enabled = true;
             }
         }
-
         /// <summary>
         /// The function executed by a thread to update the UI.
         /// </summary>
@@ -249,7 +253,6 @@ namespace MCTS_Othello
             UpdateUI();
             Console.WriteLine("UI Update thread exit.");
         }
-
         /// <summary>
         /// Launch a thread which will update the UI to show the updates from the bot player.
         /// </summary>
@@ -259,7 +262,6 @@ namespace MCTS_Othello
             uiUpdateDelegate d = new uiUpdateDelegate(this.UpdateUIAuto);
             this.Invoke(d, new object[] { cancelToken });
         }
-
         /// <summary>
         /// Close the app button pressed.
         /// </summary>
@@ -276,6 +278,49 @@ namespace MCTS_Othello
             game.SetGameState(GameState.stopped);
             cancelToken.Cancel();
             Console.WriteLine("Cancel request.");
+        }
+
+        /** Methods related to the IObserver interface. **/
+        /// <summary>
+        /// Method used to subscribe to an observed object (worker thread used to automatically update the UI 
+        /// when it has finished processing).
+        /// </summary>
+        /// <param name="publisher"></param>
+        public void Subscribe(IObservable<int> publisher)
+        {
+            unsubscriber = publisher.Subscribe(this);
+        }
+        /// <summary>
+        /// Method used to unsubscribe an observed object (worker thread used to automatically update the UI 
+        /// when it has finished processing).
+        /// </summary>
+        public void Unsubscribe()
+        {
+            unsubscriber.Dispose();
+        }
+        /// <summary>
+        /// Method called by an observed object when it has finished executing and an UI update is necessary.
+        /// </summary>
+        /// <param name="value"></param>
+        public void OnNext(int value)
+        {
+            UpdateUI();
+        }
+        /// <summary>
+        /// Method called by an observed object when an error occured.
+        /// </summary>
+        /// <param name="error"></param>
+        public void OnError(Exception error)
+        {
+            Console.WriteLine(error);
+        }
+        /// <summary>
+        /// Method used by the observer to unsubscribe from the observed object.
+        /// </summary>
+        public void OnCompleted()
+        {
+            Console.WriteLine("The Observable object has unsubscribed");
+            Unsubscribe();
         }
     }
 }
