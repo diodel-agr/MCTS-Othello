@@ -21,7 +21,7 @@ namespace MCTS_Othello.game
         Piece[,] GetPieces();
         IMCTSPlayer GetCurrentPlayer();
         IMCTSPlayer GetWinner();
-        void PlayerClicked(int x, int y);
+        bool PlayerClicked(int x, int y);
         List<Piece> GetOptions();
         int GetScore(int player);
         bool PlayerHasPossibleMoves();

@@ -85,7 +85,7 @@ namespace MCTS_Othello.game
                 return player1;
             }
         }
-        public void PlayerClicked(int x, int y)
+        public bool PlayerClicked(int x, int y)
         {
             /* see if the tile corresponds to the current player. */
             Piece p = board.pieces[x, y];
@@ -134,6 +134,8 @@ namespace MCTS_Othello.game
                     state = GameState.waitPlayer;
                 }
             }
+            // WARNING! Check this function and decide which return parameter it should have.
+            return true;
         }
         public List<Piece> GetOptions()
         {

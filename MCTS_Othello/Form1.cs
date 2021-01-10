@@ -65,7 +65,6 @@ namespace MCTS_Othello
             if (a.Equals(c) == true)
             {
                 pictureBox.MouseUp += new MouseEventHandler(this.pictureBox_MouseUp);
-                //new Thread(new ThreadStart(LaunchUpdateAuto)).Start();
             }
             else if (a.Equals(b) == true)// || a.Equals(c) == true)
             {
@@ -123,10 +122,12 @@ namespace MCTS_Othello
             
             if (cursorX >= 0 && cursorY >= 0)
             {
-                game.PlayerClicked(cursorX, cursorY);
-                game.Subscribe(this);
-                uiUpdateDelegate d = new uiUpdateDelegate(game);
-                this.Invoke(d, new object[] { cancelToken });
+                // call the delegate that executes 'game.PlayerClicked()' and subscribes to the observable.
+                if (game.PlayerClicked(cursorX, cursorY) == true)
+                {
+                    UpdateUI();
+                    game.Subscribe(this);
+                }
             }
             else
             {

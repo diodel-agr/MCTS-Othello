@@ -9,7 +9,7 @@ namespace MCTS_Othello.game
     class HCGame<T> : IMCTSGame<T>
     {
         /* static members. */
-        private static int BOT_WAIT_TIMEOUT = 500;
+        private static int BOT_WAIT_TIMEOUT = 1000;
 
         /* members. */
         Board board;
@@ -101,7 +101,7 @@ namespace MCTS_Othello.game
             board = new Board(8);
         }
 
-        public void PlayerClicked(int x, int y)
+        public bool PlayerClicked(int x, int y)
         {
             /* see if the tile corresponds to the current player. */
             Piece p = board.pieces[x, y];
@@ -142,12 +142,11 @@ namespace MCTS_Othello.game
                     currentPlayer = bot;
                     bot.SetBoard(board);
                     bot.Play(newPiece); /* newPiece is the piece placed by the human. */
-                    /* launch thread to get move from bot. */
-                    //Thread botThread = new Thread(new ThreadStart(BotThread));
-                    //botThread.Start();
-                    //botThread.Join();
+                    // tell the form to register to the observable and call the delegate.
+                    return true;
                 }
             }
+            return false;
         }
 
         public bool PlayerHasPossibleMoves()
@@ -266,11 +265,14 @@ namespace MCTS_Othello.game
         public IDisposable Subscribe(IObserver<T> observer)
         {
             // add the observer to the observers list.
-            observers.Add(observer);
+            if (observers.Contains(observer) == false)
+            {
+                observers.Add(observer);
+            }
             // start the thread to get the move from the bot and update the UI.
-            Thread botThread = new Thread(new ThreadStart(BotThread));
-            botThread.Start();
-            botThread.Join();
+            BotThread();
+            T value = default(T);
+            Refresh(value);
             return new Unsubscriber<T>(observers, observer);
         }
         /// <summary>

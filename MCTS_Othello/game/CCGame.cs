@@ -123,7 +123,7 @@ namespace MCTS_Othello.game
             return winner;
         }
 
-        public void PlayerClicked(int x, int y)
+        public bool PlayerClicked(int x, int y)
         {
             throw new NotImplementedException();
         }
