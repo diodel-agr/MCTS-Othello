@@ -188,7 +188,7 @@ namespace MCTS_Othello.player.MCTS.simulation
             else
             {   /* update game state. */
                 bool found = false;
-                foreach (Node ch in root.GetChildren())
+                foreach (Node ch in root.GetChildren()) // when here a null pointer dereference is thrown, the game is finished, probably the bot won.
                 {
                     if (ch.X == newPiece.X && ch.Y == newPiece.Y)
                     {

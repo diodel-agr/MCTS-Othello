@@ -236,7 +236,7 @@ namespace MCTS_Othello.game
             {
                 throw new MCTSException("[HCGame/PlayerClicked()] - Bot returned a null move.");
             }
-            Console.WriteLine("Bot chose piece:" + piece.X + ": " + piece.Y);
+            Console.WriteLine("Bot chose piece: " + piece.X + ": " + piece.Y);
             board.AddPiece(piece);
             List<Piece> neigh = board.GetPieceNeighbors(piece);
             foreach (Piece n in neigh)

@@ -115,8 +115,6 @@ namespace MCTS_Othello
             }
         }
 
-        private void pictureBox_Click(object sender, MouseEventArgs e) { }
-
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
             /* get the coords of the clicked tile. */
@@ -250,7 +248,7 @@ namespace MCTS_Othello
             }
         }
         /// <summary>
-        /// The function executed by a thread to update the UI.
+        /// The function used to update the UI continously until the game ends or the program is stopped.
         /// </summary>
         /// <param name="token"></param>
         private void UpdateUIAuto(object token)

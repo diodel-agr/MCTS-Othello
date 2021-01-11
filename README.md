@@ -11,3 +11,5 @@ Monte Carlo Tree Search (MCTS) bot for the Othello game.
 - simplify fer loops with foreach (where possible).
 - solve null reference on option list when clicked on an empty tile.
 - create game factory.
+- fix NullReferenceException in SandomSimulation:191.
+- both Play methods from MCTSPlayer are empty...not cool, man
