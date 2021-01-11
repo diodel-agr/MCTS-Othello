@@ -22,6 +22,8 @@ namespace MCTS_Othello
 
         CancellationTokenSource cancelToken;
         delegate void uiUpdateDelegate(object token);
+        delegate void newUIUpdateDelegate();
+        delegate void SubscribeDelegate(IObservable<int> obs);
 
         public Form1()
         {
@@ -125,8 +127,17 @@ namespace MCTS_Othello
                 // call the delegate that executes 'game.PlayerClicked()' and subscribes to the observable.
                 if (game.PlayerClicked(cursorX, cursorY) == true)
                 {
-                    UpdateUI();
-                    game.Subscribe(this);
+                    // launch a worker thread that will get the bot's next move and update the UI.
+                    // this way the UI thread is not blocked and the operation is permitted (does not throw any exceptions).
+                    Thread worker = new Thread(
+                        new ParameterizedThreadStart(
+                            (form) => {
+                                ((Form)form).Invoke((MethodInvoker)delegate {
+                                    game.Subscribe(this); // runs on UI thread
+                            });
+                        })
+                    );
+                    worker.Start(this);
                 }
             }
             else
