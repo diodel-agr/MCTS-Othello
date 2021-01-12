@@ -154,6 +154,7 @@ namespace MCTS_Othello
 
         private void UpdateUI()
         {
+            Console.WriteLine("UI update " + game.GetScore(1) + ":" + game.GetScore(2));
             /* update current player and score. */
             currentPlayerLabel.Text = "Current player: " + game.GetCurrentPlayer().GetColor().ToString();
             playerOneScoreLabel.Text = game.GetPlayer(1).GetColor().ToString() + " score: " + game.GetScore(1);
@@ -281,15 +282,6 @@ namespace MCTS_Othello
         {
             Application.Exit();
         }
-
-        // de reparat functia asta.
-        protected void ReleaseResources(object sender, FormClosingEventArgs e)
-        {
-            game.SetGameState(GameState.stopped);
-            cancelToken.Cancel();
-            Console.WriteLine("Cancel request.");
-        }
-
         /** Methods related to the IObserver interface. **/
         /// <summary>
         /// Method used to subscribe to an observed object (worker thread used to automatically update the UI 

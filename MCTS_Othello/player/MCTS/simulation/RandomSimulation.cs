@@ -150,7 +150,7 @@ namespace MCTS_Othello.player.MCTS.simulation
             {
                 throw new MCTSException("[RandomSimulation/StartSimulation(Piece)] - child node not found!");
             }
-            //UpdateBoard(board, p);
+            //PlacePieceOnBoard(board, p);
             /* start simulation. */
             StartSimulation();
         }
@@ -218,18 +218,10 @@ namespace MCTS_Othello.player.MCTS.simulation
             Board b = (Board)(objArr[1]);
             Node cn = (Node)(objArr[2]);
             /* choose simulation color. */
-            Color rootColor;
-            if (cn.X == -1)
-            {
-                rootColor = Color.black;
-            }
-            else if (b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
+            Color rootColor = Color.black;
+            if (b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
             {
                 rootColor = Color.white;
-            }
-            else
-            {
-                rootColor = Color.black;
             }
             IExpansion expansion = new SimpleExpansion();
             int win = 0;
@@ -264,6 +256,18 @@ namespace MCTS_Othello.player.MCTS.simulation
             b.FreePieces();
             b = null;
         }
+        /// <summary>
+        /// This method executes the simulation of a game. It decides the statistics (wins and simulations)
+        /// for a certain starting node. Based on the current board and the current player, chooses the next move
+        /// until the end of the game. If the current player (the bot) wins, it returns 1 (1 win) and updates 
+        /// (back-propagates the results) back in the recursion stack.
+        /// </summary>
+        /// <param name="token">Cancellation token used to stop the execution of the thread executing this function.</param>
+        /// <param name="b">The current board.</param>
+        /// <param name="n">The current node, representing the board configuration.</param>
+        /// <param name="expansion">Object representing the expansion strategy.</param>
+        /// <param name="expandColor">The color of the next player.</param>
+        /// <returns></returns>
         private int Simulate(CancellationTokenSource token, Board b, Node n, IExpansion expansion, Color expandColor)
         {
             //Console.WriteLine("Expand " + expandColor.ToString());
@@ -303,7 +307,7 @@ namespace MCTS_Othello.player.MCTS.simulation
                     {
                         throw new MCTSException("next node is not null!");
                     }
-                    UpdateBoard(b, pct);
+                    PlacePieceOnBoard(b, pct);
                     /* simulate. */
                     res = Simulate(token, b, nextNode, expansion, expandColor);
                     /* update node statistics if cancellation is not set. */
@@ -320,6 +324,12 @@ namespace MCTS_Othello.player.MCTS.simulation
             }
             return res; /* return result. */
         }
+        /// <summary>
+        /// This method returns the color of the current player based on the current node.
+        /// </summary>
+        /// <param name="b">Current board.</param>
+        /// <param name="n">current node representing the state of the board.</param>
+        /// <returns></returns>
         private Color GetColor(Board b, Node n)
         {
             Color color;
@@ -358,7 +368,7 @@ namespace MCTS_Othello.player.MCTS.simulation
             }
             return result;
         }
-        private void UpdateBoard(Board b, Piece p)
+        private void PlacePieceOnBoard(Board b, Piece p)
         {
             b.AddPiece(p);
             foreach (Piece n in b.GetPieceNeighbors(p))

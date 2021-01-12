@@ -130,7 +130,7 @@ namespace MCTS_Othello.game
                 if (isInList == true)
                 {
                     /* add tile to the board. */
-                    Piece newPiece = new ui.Piece(x, y, player1);
+                    Piece newPiece = new Piece(x, y, player1);
                     board.AddPiece(newPiece);
                     foreach (Piece n in board.GetPieceNeighbors(newPiece))
                     {
