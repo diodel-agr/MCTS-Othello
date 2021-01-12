@@ -52,21 +52,7 @@ namespace MCTS_Othello.player
                     result = new Piece(dest);
                 }
             }
-            if (result == null)
-            {
-                throw new MCTSException("[RandomComputer/MakeMove()] - |MakeMove returns a null piece!");
-            }
             return result;
-        }
-
-        public void Play()
-        {
-            return;
-        }
-
-        public void Play(Piece lastMove)
-        {
-            return;
         }
         public void SetBoard(Board b)
         {

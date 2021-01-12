@@ -49,25 +49,6 @@ namespace MCTS_Othello.player
             /* return result. */
             return bestPiece;
         }
-
-        public void Play()
-        {
-            //simulation.StartSimulation();
-        }
-
-        public void Play(Piece lastMove)
-        {
-            /* start simulation. */
-            //if (lastMove != null)
-            //{
-            //    simulation.StartSimulation(lastMove);
-            //}
-            //else
-            //{
-            //    simulation.StartSimulation();
-            //}
-        }
-
         public Color GetColor()
         {
             return color;

@@ -29,17 +29,6 @@ namespace MCTS_Othello.player
         {
             return null;
         }
-
-        public void Play()
-        {
-            return;
-        }
-
-        public void Play(Piece lastMove)
-        {
-            return;
-        }
-
         public Color GetColor()
         {
             return color;

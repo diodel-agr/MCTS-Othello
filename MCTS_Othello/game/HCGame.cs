@@ -141,7 +141,6 @@ namespace MCTS_Othello.game
                     /* let bot play. */
                     currentPlayer = bot;
                     bot.SetBoard(board);
-                    bot.Play(newPiece); /* newPiece is the piece placed by the human. */
                     // tell the form to register to the observable and call the delegate.
                     return true;
                 }
@@ -183,7 +182,6 @@ namespace MCTS_Othello.game
             currentPlayer = player1;
             /* set bot board. */
             bot.SetBoard(board);
-            bot.Play(null);
         }
 
         public bool IsFinished()
@@ -234,7 +232,7 @@ namespace MCTS_Othello.game
             Piece piece = bot.MakeMove();
             if (piece == null)
             {
-                throw new MCTSException("[HCGame/PlayerClicked()] - Bot returned a null move.");
+                return;
             }
             Console.WriteLine("Bot chose piece: " + piece.X + ": " + piece.Y);
             board.AddPiece(piece);
@@ -245,7 +243,6 @@ namespace MCTS_Othello.game
             }
             //board.PrintBoard();
             bot.SetBoard(board);
-            bot.Play();
             // find a way to get rid of this ugly call to garbage collector.
             GC.Collect();
             /* set next player. */

@@ -65,9 +65,7 @@ namespace MCTS_Othello.game
             currentPlayer = player1;
             /* set bots boards. */
             player1.SetBoard(board);
-            player1.Play(null);
             player2.SetBoard(board);
-            player2.Play(null);
             /* launch the thread that will let the 2 bots to play. */
             Thread botThread = new Thread(new ThreadStart(BotPlay));
             botThread.Start();
@@ -204,7 +202,6 @@ namespace MCTS_Othello.game
             {
                 /* let the current player play. */
                 currentPlayer.SetBoard(board);
-                currentPlayer.Play(lastMove);
                 Thread.Sleep(1000);
                 /* obtain move. */
                 Piece move = currentPlayer.MakeMove();
