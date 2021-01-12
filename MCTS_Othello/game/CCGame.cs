@@ -19,30 +19,8 @@ namespace MCTS_Othello.game
         /* constructors. */
         public CCGame(string bot1, string bot2)
         {
-            switch (bot1)
-            {
-                case "MCTS":
-                    player1 = new MCTSPlayer(Color.black, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
-                    break;
-                case "Random":
-                    player1 = new RandomComputer(Color.black);
-                    break;
-                default:
-                    player1 = null;
-                    break;
-            }
-            switch (bot2)
-            {
-                case "MCTS":
-                    player2 = new MCTSPlayer(Color.white, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
-                    break;
-                case "Random":
-                    player2 = new RandomComputer(Color.white);
-                    break;
-                default:
-                    player2 = null;
-                    break;
-            }
+            player1 = PlayerFactory.Create(bot1, Color.black, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
+            player2 = PlayerFactory.Create(bot2, Color.white, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
             pieceMutex = new Mutex();
         }
         /* methods. */

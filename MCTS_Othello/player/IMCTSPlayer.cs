@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MCTS_Othello.player
 {
-    /**
-     * This interface specify the operations executed by players.
-     */
+    /// <summary>
+    /// This interface specifies the operations executed by players.
+    /// </summary>
     interface IMCTSPlayer
     {
         Piece MakeMove(); /* trb modifica sa intoarca numai Piece[1]. */

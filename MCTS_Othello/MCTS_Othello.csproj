@@ -53,6 +53,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="game\CCGame.cs" />
+    <Compile Include="game\GameFactory.cs" />
     <Compile Include="game\HCGame.cs" />
     <Compile Include="game\HHGame.cs" />
     <Compile Include="game\IMCTSGame.cs" />
@@ -61,14 +62,19 @@
     <Compile Include="player\HumanPlayer.cs" />
     <Compile Include="player\IMCTSPlayer.cs" />
     <Compile Include="player\MCTSPlayer.cs" />
+    <Compile Include="player\MCTS\back_propagation\BackPropagationFactory.cs" />
     <Compile Include="player\MCTS\back_propagation\IBackPropagation.cs" />
     <Compile Include="player\MCTS\back_propagation\SimpleBackPropagation.cs" />
+    <Compile Include="player\MCTS\expansion\ExpansionFactory.cs" />
     <Compile Include="player\MCTS\expansion\IExpansion.cs" />
     <Compile Include="player\MCTS\expansion\SimpleExpansion.cs" />
     <Compile Include="player\MCTS\selection\ISelection.cs" />
+    <Compile Include="player\MCTS\selection\SelectionFactory.cs" />
     <Compile Include="player\MCTS\selection\SimpleSelection.cs" />
     <Compile Include="player\MCTS\simulation\ISimulation.cs" />
     <Compile Include="player\MCTS\simulation\RandomSimulation.cs" />
+    <Compile Include="player\MCTS\simulation\SimulationFactory.cs" />
+    <Compile Include="player\PlayerFactory.cs" />
     <Compile Include="player\RandomComputer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

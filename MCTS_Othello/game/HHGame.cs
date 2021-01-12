@@ -57,8 +57,8 @@ namespace MCTS_Othello.game
         }
         public void InitBoard()
         {
-            player1 = new HumanPlayer(Color.black);
-            player2 = new HumanPlayer(Color.white);
+            player1 = PlayerFactory.Create("Human", Color.black, null, null, null, null);
+            player2 = PlayerFactory.Create("Human", Color.white, null, null, null, null);
             board = new Board(8);
         }
         public void RestartGame()

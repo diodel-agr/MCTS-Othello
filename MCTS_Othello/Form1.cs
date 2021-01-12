@@ -1,4 +1,5 @@
-﻿using MCTS_Othello.game;
+﻿using MCTS_Othello.config;
+using MCTS_Othello.game;
 using MCTS_Othello.ui;
 using System;
 using System.Collections.Generic;
@@ -47,18 +48,8 @@ namespace MCTS_Othello
         {
             /* set game type. */
             int gameIdx = gameTypeComboBox.SelectedIndex;
-            switch (gameIdx)
-            {
-                case 0: // "Human vs. Human":
-                    game = new HHGame<int>();
-                    break;
-                case 1: // "Human vs. Computer":
-                    game = new HCGame<int>(botOne);
-                    break;
-                case 2: // "Computer vs. Computer":
-                    game = new CCGame<int>(botOne, botTwo);
-                    break;
-            }
+            game = GameFactory<int>.Create(gameIdx, botOne, botTwo);
+            
             game.Start();
             
             pictureBox.Size = boardImage.Size;
@@ -140,7 +131,7 @@ namespace MCTS_Othello
             }
             else
             {
-                throw new MCTSException("[Form/pictureBox_MouseUp] - negative coords.");
+                throw new MCTSException("[Form::pictureBox_MouseUp] - negative coords.");
             }
             /* refresh. */
             UpdateUI();
@@ -170,41 +161,17 @@ namespace MCTS_Othello
 
         private void gameTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (gameTypeComboBox.SelectedIndex)
-            {
-                case 0: // "Human vs. Human"
-                    /* enable. */
-                    startButton.Enabled = true;
-                    restartButton.Enabled = true;
-                    /* disable. */
-                    botOneLabel.Enabled = false;
-                    botOneComboBox.Enabled = false;
-                    botTwoLabel.Enabled = false;
-                    botTwoComboBox.Enabled = false;
-                    botOne = botTwo = null;
-                    break;
-                case 1: // "Human vs. Computer"
-                    /* enable. */
-                    botOneLabel.Enabled = true;
-                    botOneComboBox.Enabled = true;
-                    /* disable. */
-                    startButton.Enabled = false;
-                    restartButton.Enabled = false;
-                    botTwoLabel.Enabled = false;
-                    botTwoComboBox.Enabled = false;
-                    botTwo = "";
-                    break;
-                case 2: // "Computer vs. Computer"
-                    /* enable. */
-                    botOneLabel.Enabled = true;
-                    botOneComboBox.Enabled = true;
-                    botTwoLabel.Enabled = true;
-                    botTwoComboBox.Enabled = true;
-                    /* disbale. */
-                    startButton.Enabled = false;
-                    restartButton.Enabled = false;
-                    break;
-            }
+            GameTypeConfig.Config(gameTypeComboBox.SelectedIndex, this);
+            
+        }
+        /// <summary>
+        /// Method used to set the status of a control.
+        /// </summary>
+        /// <param name="ctrl"></param>
+        /// <param name="status">Boolean value representing the status of control.</param>
+        public void SetControlStatus(Control ctrl, bool status)
+        {
+            ctrl.Enabled = status;
         }
 
         private void botTwoComboBox_SelectedIndexChanged(object sender, EventArgs e)

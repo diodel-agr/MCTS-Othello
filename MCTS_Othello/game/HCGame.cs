@@ -38,18 +38,8 @@ namespace MCTS_Othello.game
 
         public HCGame(string comp) : this()
         {
-            player1 = new HumanPlayer(Color.black);
-            switch (comp)
-            {
-                case "MCTS":
-                    bot = new MCTSPlayer(Color.white, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
-                    break;
-                case "Random":
-                    bot = new RandomComputer(Color.white);
-                    break;
-                default:
-                    throw new MCTSException("Unknown bot type!");
-            }
+            player1 = PlayerFactory.Create("Human", Color.black, null, null, null, null);
+            bot = PlayerFactory.Create(comp, Color.white, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
         }
         /* methods. */
         public IMCTSPlayer GetCurrentPlayer()

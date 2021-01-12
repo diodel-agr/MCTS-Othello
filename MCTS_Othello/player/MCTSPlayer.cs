@@ -21,14 +21,7 @@ namespace MCTS_Othello.player
         public MCTSPlayer(Color c, string sel, string exp, string sim, string bp)
         {
             color = c;
-            switch (sel)
-            {
-                case "simple_selection":
-                    selection = new SimpleSelection();
-                    break;
-                default:
-                    throw new MCTSException("[MCTSPlayer constructor] - invalid selection type.");
-            }
+            selection = SelectionFactory.Create(sel);
             simulation = null;
             simulationType = sim;
             expansionType = exp;
@@ -71,14 +64,9 @@ namespace MCTS_Othello.player
                 }
                 if (opponent == null)
                 {
-                    throw new MCTSException("[MCTSPlayer/SetBoard] - Could not found the opponent!");
+                    throw new MCTSException("[MCTSPlayer::SetBoard] - Could not found the opponent!");
                 }
-                switch (simulationType)
-                {
-                    case "random_simulation":
-                        simulation = new RandomSimulation(this, opponent, board, expansionType, backPropagationType);
-                        break;
-                }
+                simulation = SimulationFactory.Create(simulationType, this, opponent, board, expansionType, backPropagationType);
                 simulation.StartSimulation();
             }
             else

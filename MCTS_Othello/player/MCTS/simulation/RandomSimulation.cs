@@ -34,22 +34,8 @@ namespace MCTS_Othello.player.MCTS.simulation
             this.thisPlayer = thisPlayer;
             this.opponent = opponent;
             wins = visits = 0;
-            switch (expansion)
-            {
-                case "simple_expansion":
-                    exp = new SimpleExpansion();
-                    break;
-                default:
-                    throw new MCTSException("[RandomSimulation constructor] - invalid expantion type.");
-            }
-            switch (backPropagation)
-            {
-                case "simple_bp":
-                    bp = new SimpleBackPropagation();
-                    break;
-                default:
-                    throw new MCTSException("[RandomSimulation constructor] - invalid back propagation type.");
-            }
+            exp = ExpansionFactory.Create(expansion);
+            bp = BackPropagationFactory.Create(backPropagation);
             rand = new Random();
             workers = new List<Thread>(threadNo);
             mutex = new Mutex();
@@ -219,7 +205,7 @@ namespace MCTS_Othello.player.MCTS.simulation
             Node cn = (Node)(objArr[2]);
             /* choose simulation color. */
             Color rootColor = Color.black;
-            if (b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
+            if (cn.X != -1 && b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
             {
                 rootColor = Color.white;
             }
