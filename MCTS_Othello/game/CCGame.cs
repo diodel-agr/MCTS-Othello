@@ -16,9 +16,12 @@ namespace MCTS_Othello.game
         Piece lastMove;
         GameState state;
         Mutex pieceMutex;
+        CancellationTokenSource cancelToken; // token used to stop the worker thread.
+        Thread botThread;
         /* constructors. */
         public CCGame(string bot1, string bot2)
         {
+            cancelToken = new CancellationTokenSource();
             player1 = PlayerFactory.Create(bot1, Color.black, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
             player2 = PlayerFactory.Create(bot2, Color.white, "simple_selection", "simple_expansion", "random_simulation", "simple_bp");
             pieceMutex = new Mutex();
@@ -45,8 +48,8 @@ namespace MCTS_Othello.game
             player1.SetBoard(board);
             player2.SetBoard(board);
             /* launch the thread that will let the 2 bots to play. */
-            Thread botThread = new Thread(new ThreadStart(BotPlay));
-            botThread.Start();
+            botThread = new Thread(new ParameterizedThreadStart(BotPlay));
+            botThread.Start(cancelToken);
         }
 
         public void InitBoard()
@@ -56,6 +59,11 @@ namespace MCTS_Othello.game
 
         public void RestartGame()
         {
+            // stop the thread.
+            cancelToken.Cancel();
+            // wait for the worker to stop.
+            botThread.Join();
+            // start another game.
             Start();
         }
 
@@ -172,11 +180,13 @@ namespace MCTS_Othello.game
             return result;
         }
         
-        private void BotPlay()
+        private void BotPlay(object token)
         {
             Console.WriteLine("Game thread started!");
+            CancellationTokenSource cancelToken = (CancellationTokenSource)token;
             lastMove = null;
-            while (board.IsFinished(currentPlayer) == false && state != GameState.stopped)
+            while (board.IsFinished(currentPlayer) == false && state != GameState.stopped 
+                && cancelToken.IsCancellationRequested != true)
             {
                 /* let the current player play. */
                 currentPlayer.SetBoard(board);
@@ -215,10 +225,14 @@ namespace MCTS_Othello.game
             state = GameState.stopped;
             Console.WriteLine("Game thread exit!");
         }
-
+        /// <summary>
+        /// Method used by the observers to register to this observable.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns></returns>
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

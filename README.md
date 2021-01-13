@@ -3,10 +3,9 @@ Monte Carlo Tree Search (MCTS) bot for the Othello game.
 
 ## TO DO
 - simplify IMCTSGame interface.
-- make the ui update after bot move automated. [done for HC game]
 - the score does not update after the player places a piece.
-- fix cc game ui update.
 - refator comments.
+- remove commented code.
 - create an enum or something with the color of each player.
 - create an enum with the configuration of the MCTSPlayer player.
 - solve the 'out of memory issue, get rid of GV.Collect calls.
@@ -20,3 +19,10 @@ manual Board::AddPiece(p1, p2) afterwards.
 - treat move == null in CCGame:207.
 - bot1 and bot2 combo box implementations are too similar.
 - human player generates method not implemented exception in subscribe method.
+- create a greedy bot :D
+- parameterize Thread.Sleep() parameters.
+- error in simulation when starting the game after it was stopped.
+- some thread remains in execution in the cc game after stop.
+
+## DONE
+- make the ui update after bot move automated. Done for all game types.

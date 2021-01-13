@@ -200,10 +200,14 @@ namespace MCTS_Othello.game
             }
             return result;
         }
-
+        /// <summary>
+        /// Method used by the observers to register to this observable.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns></returns>
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using MCTS_Othello.config;
-using MCTS_Othello.game;
+﻿using MCTS_Othello.game;
 using MCTS_Othello.ui;
 using System;
 using System.Collections.Generic;
@@ -22,6 +21,7 @@ namespace MCTS_Othello
         IDisposable unsubscriber;
 
         CancellationTokenSource cancelToken;
+        Thread uiUpdaterWorker;
         delegate void uiUpdateDelegate(object token);
         delegate void newUIUpdateDelegate();
         delegate void SubscribeDelegate(IObservable<int> obs);
@@ -29,6 +29,7 @@ namespace MCTS_Othello
         public Form1()
         {
             InitializeComponent();
+            cancelToken = new CancellationTokenSource();
             boardImage = (Bitmap)Image.FromFile("board.png");
             blackPiece = (Bitmap)Image.FromFile("black.png");
             whitePiece = (Bitmap)Image.FromFile("white.png");
@@ -43,32 +44,46 @@ namespace MCTS_Othello
             botOne = botTwo = null;
             pictureBox.Refresh();
         }
-
+        /// <summary>
+        /// "Start" button press event handler. This method starts the game. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void startButton_Click(object sender, EventArgs e)
         {
             /* set game type. */
             int gameIdx = gameTypeComboBox.SelectedIndex;
             game = GameFactory<int>.Create(gameIdx, botOne, botTwo);
-            
             game.Start();
-            
             pictureBox.Size = boardImage.Size;
             pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
             Type a = game.GetType(), b = typeof(HHGame<int>), c = typeof(HCGame<int>);
-            if (a.Equals(c) == true)
+            if (a.Equals(b) == true || a.Equals(c) == true)
             {
                 pictureBox.MouseUp += new MouseEventHandler(this.pictureBox_MouseUp);
-            }
-            else if (a.Equals(b) == true)// || a.Equals(c) == true)
-            {
-                pictureBox.MouseUp += new MouseEventHandler(this.pictureBox_MouseUp);
-                //new Thread(new ThreadStart(LaunchUpdateAuto)).Start();
-                
             }
             else
-            {   /* launch a thread that will update the ui. */
-                new Thread(new ThreadStart(LaunchUpdateAuto)).Start();
+            {   /* CCGame: launch a thread that will update the ui. */
+                // launch a worker thread that will get the bot's next move and update the UI.
+                // this way the UI thread is not blocked and the operation is permitted (does not throw any exceptions).
+                uiUpdaterWorker = new Thread(
+                    new ParameterizedThreadStart(
+                        (parameter) => {
+                            Form1 form = (Form1)parameter;
+                            while (game.IsFinished() == false && cancelToken.IsCancellationRequested == false)
+                            {
+                                ((Form1)form).Invoke((MethodInvoker)delegate
+                                {
+                                    form.UpdateUI(); // runs on UI thread.
+                                });
+                                Thread.Sleep(500);
+                            }
+                            Console.WriteLine("UI Updater thread exit.");
+                        })
+                );
+                uiUpdaterWorker.Start(this);
             }
+            Console.WriteLine("A iesit");
             pictureBox.Refresh();
         }
 
@@ -122,7 +137,7 @@ namespace MCTS_Othello
                         new ParameterizedThreadStart(
                             (form) => {
                                 ((Form)form).Invoke((MethodInvoker)delegate {
-                                    game.Subscribe(this); // runs on UI thread
+                                    game.Subscribe(this); // runs on UI thread.
                             });
                         })
                     );
@@ -136,14 +151,24 @@ namespace MCTS_Othello
             /* refresh. */
             UpdateUI();
         }
-
+        /// <summary>
+        /// "Restart" button press event handler. This method stops worker threads and stops the game.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void restartButton_Click(object sender, EventArgs e)
         {
+            // stop uiUpdaterWorker.
+            cancelToken.Cancel();
+            // restart game.
             game.RestartGame();
+            // refresh UI.
             pictureBox.Refresh();
         }
-
-        private void UpdateUI()
+        /// <summary>
+        /// Method used to update the controls from the UI after a player's move.
+        /// </summary>
+        public void UpdateUI()
         {
             Console.WriteLine("UI update " + game.GetScore(1) + ":" + game.GetScore(2));
             /* update current player and score. */
@@ -158,11 +183,51 @@ namespace MCTS_Othello
             }
             pictureBox.Refresh();
         }
-
+        /// <summary>
+        /// The function used to update the UI continously until the game ends or the program is stopped.
+        /// </summary>
+        /// <param name="token"></param>
+        public void UpdateUIAuto(object token)
+        {
+            UpdateUI();
+        }
         private void gameTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            GameTypeConfig.Config(gameTypeComboBox.SelectedIndex, this);
-            
+            switch (gameTypeComboBox.SelectedIndex)
+            {
+                case 0: // "Human vs. Human"
+                    /* enable. */
+                    startButton.Enabled = true;
+                    restartButton.Enabled = true;
+                    /* disable. */
+                    botOneLabel.Enabled = false;
+                    botOneComboBox.Enabled = false;
+                    botTwoLabel.Enabled = false;
+                    botTwoComboBox.Enabled = false;
+                    botOne = botTwo = null;
+                    break;
+                case 1: // "Human vs. Computer"
+                    /* enable. */
+                    botOneLabel.Enabled = true;
+                    botOneComboBox.Enabled = true;
+                    /* disable. */
+                    startButton.Enabled = false;
+                    restartButton.Enabled = false;
+                    botTwoLabel.Enabled = false;
+                    botTwoComboBox.Enabled = false;
+                    botTwo = "";
+                    break;
+                case 2: // "Computer vs. Computer"
+                    /* enable. */
+                    botOneLabel.Enabled = true;
+                    botOneComboBox.Enabled = true;
+                    botTwoLabel.Enabled = true;
+                    botTwoComboBox.Enabled = true;
+                    /* disbale. */
+                    startButton.Enabled = false;
+                    restartButton.Enabled = false;
+                    break;
+            }
         }
         /// <summary>
         /// Method used to set the status of a control.
@@ -216,22 +281,6 @@ namespace MCTS_Othello
             }
         }
         /// <summary>
-        /// The function used to update the UI continously until the game ends or the program is stopped.
-        /// </summary>
-        /// <param name="token"></param>
-        private void UpdateUIAuto(object token)
-        {
-            Console.WriteLine("UI Update auto thread start.");
-            CancellationTokenSource cancelToken = (CancellationTokenSource)token;
-            while (game.IsFinished() == false && cancelToken.IsCancellationRequested == false)
-            {
-                UpdateUI();
-                Thread.Sleep(50000);
-            }
-            UpdateUI();
-            Console.WriteLine("UI Update thread exit.");
-        }
-        /// <summary>
         /// Launch a thread which will update the UI to show the updates from the bot player.
         /// </summary>
         private void LaunchUpdateAuto()
@@ -273,7 +322,10 @@ namespace MCTS_Othello
         /// <param name="value"></param>
         public void OnNext(int value)
         {
-            UpdateUI();
+            this.Invoke((MethodInvoker)delegate {
+                UpdateUI(); // runs on UI thread.
+            });
+            
         }
         /// <summary>
         /// Method called by an observed object when an error occured.
