@@ -3,7 +3,6 @@ Monte Carlo Tree Search (MCTS) bot for the Othello game.
 
 ## TO DO
 - simplify IMCTSGame interface.
-- the score does not update after the player places a piece.
 - refator comments.
 - remove commented code.
 - create an enum or something with the color of each player.
@@ -26,3 +25,4 @@ manual Board::AddPiece(p1, p2) afterwards.
 
 ## DONE
 - make the ui update after bot move automated. Done for all game types.
+- the score does not update after the player places a piece.

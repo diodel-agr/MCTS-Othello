@@ -22,9 +22,6 @@ namespace MCTS_Othello
 
         CancellationTokenSource cancelToken;
         Thread uiUpdaterWorker;
-        delegate void uiUpdateDelegate(object token);
-        delegate void newUIUpdateDelegate();
-        delegate void SubscribeDelegate(IObservable<int> obs);
 
         public Form1()
         {
@@ -125,7 +122,6 @@ namespace MCTS_Othello
         {
             /* get the coords of the clicked tile. */
             int cursorX = (e.X - 2) / 50, cursorY = (e.Y - 2) / 50;
-            
             if (cursorX >= 0 && cursorY >= 0)
             {
                 // call the delegate that executes 'game.PlayerClicked()' and subscribes to the observable.
@@ -152,18 +148,26 @@ namespace MCTS_Othello
             UpdateUI();
         }
         /// <summary>
-        /// "Restart" button press event handler. This method stops worker threads and stops the game.
+        /// "Restart" button press event handler. This method stops the game and refreshes the UI.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void restartButton_Click(object sender, EventArgs e)
         {
+            // stop the game.
+            StopGame();
+            // refresh UI.
+            pictureBox.Refresh();
+        }
+        /// <summary>
+        /// Method used to stop the worker game-worker threads and restart the game state.
+        /// </summary>
+        private void StopGame()
+        {
             // stop uiUpdaterWorker.
             cancelToken.Cancel();
             // restart game.
             game.RestartGame();
-            // refresh UI.
-            pictureBox.Refresh();
         }
         /// <summary>
         /// Method used to update the controls from the UI after a player's move.
@@ -173,8 +177,11 @@ namespace MCTS_Othello
             Console.WriteLine("UI update " + game.GetScore(1) + ":" + game.GetScore(2));
             /* update current player and score. */
             currentPlayerLabel.Text = "Current player: " + game.GetCurrentPlayer().GetColor().ToString();
+            currentPlayerLabel.Refresh();
             playerOneScoreLabel.Text = game.GetPlayer(1).GetColor().ToString() + " score: " + game.GetScore(1);
+            playerOneScoreLabel.Refresh();
             playerTwoScoreLabel.Text = game.GetPlayer(2).GetColor().ToString() + " score: " + game.GetScore(2);
+            playerTwoScoreLabel.Refresh();
             /* check if the game is finished. */
             if (game.IsFinished() == true)
             {
@@ -182,14 +189,6 @@ namespace MCTS_Othello
                 game.SetGameState(GameState.stopped);
             }
             pictureBox.Refresh();
-        }
-        /// <summary>
-        /// The function used to update the UI continously until the game ends or the program is stopped.
-        /// </summary>
-        /// <param name="token"></param>
-        public void UpdateUIAuto(object token)
-        {
-            UpdateUI();
         }
         private void gameTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -228,15 +227,6 @@ namespace MCTS_Othello
                     restartButton.Enabled = false;
                     break;
             }
-        }
-        /// <summary>
-        /// Method used to set the status of a control.
-        /// </summary>
-        /// <param name="ctrl"></param>
-        /// <param name="status">Boolean value representing the status of control.</param>
-        public void SetControlStatus(Control ctrl, bool status)
-        {
-            ctrl.Enabled = status;
         }
 
         private void botTwoComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -281,21 +271,15 @@ namespace MCTS_Othello
             }
         }
         /// <summary>
-        /// Launch a thread which will update the UI to show the updates from the bot player.
-        /// </summary>
-        private void LaunchUpdateAuto()
-        {
-            cancelToken = new CancellationTokenSource();
-            uiUpdateDelegate d = new uiUpdateDelegate(this.UpdateUIAuto);
-            this.Invoke(d, new object[] { cancelToken });
-        }
-        /// <summary>
         /// Close the app button pressed.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            // stop the game.
+            StopGame();
+            // close the app.
             Application.Exit();
         }
         /** Methods related to the IObserver interface. **/
