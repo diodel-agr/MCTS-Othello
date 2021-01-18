@@ -23,6 +23,8 @@ namespace MCTS_Othello
         CancellationTokenSource cancelToken;
         Thread uiUpdaterWorker;
 
+        private static int UI_REFRESH_RATE = 500;
+
         public Form1()
         {
             InitializeComponent();
@@ -69,21 +71,52 @@ namespace MCTS_Othello
                             Form1 form = (Form1)parameter;
                             while (game.IsFinished() == false && cancelToken.IsCancellationRequested == false)
                             {
-                                ((Form1)form).Invoke((MethodInvoker)delegate
+                                form.Invoke((MethodInvoker)delegate
                                 {
                                     form.UpdateUI(); // runs on UI thread.
                                 });
-                                Thread.Sleep(500);
+                                Thread.Sleep(UI_REFRESH_RATE);
                             }
-                            Console.WriteLine("UI Updater thread exit.");
+                            Console.WriteLine("[FORM] UI Updater thread exit.");
                         })
                 );
                 uiUpdaterWorker.Start(this);
             }
-            Console.WriteLine("A iesit");
             pictureBox.Refresh();
         }
-
+        /// <summary>
+        /// "Restart" button press event handler. This method stops the game and refreshes the UI.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void restartButton_Click(object sender, EventArgs e)
+        {
+            // stop the game.
+            StopGame();
+            // refresh UI.
+            pictureBox.Refresh();
+        }
+        /// <summary>
+        /// Method used to stop the worker game-worker threads and restart the game state.
+        /// </summary>
+        private void StopGame()
+        {
+            Thread stopper = new Thread(
+                new ThreadStart(() =>
+                {
+                    // stop uiUpdaterWorker.
+                    cancelToken.Cancel();
+                    // restart game.
+                    game.RestartGame();
+                    // update the ui.
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        pictureBox.Refresh();
+                    });
+                })
+            );
+            stopper.Start();
+        }
         private void pictureBox_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
             int offsetX = 2, offsetY = 2;
@@ -129,15 +162,7 @@ namespace MCTS_Othello
                 {
                     // launch a worker thread that will get the bot's next move and update the UI.
                     // this way the UI thread is not blocked and the operation is permitted (does not throw any exceptions).
-                    Thread worker = new Thread(
-                        new ParameterizedThreadStart(
-                            (form) => {
-                                ((Form)form).Invoke((MethodInvoker)delegate {
-                                    game.Subscribe(this); // runs on UI thread.
-                            });
-                        })
-                    );
-                    worker.Start(this);
+                    game.Subscribe(this);
                 }
             }
             else
@@ -148,33 +173,10 @@ namespace MCTS_Othello
             UpdateUI();
         }
         /// <summary>
-        /// "Restart" button press event handler. This method stops the game and refreshes the UI.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void restartButton_Click(object sender, EventArgs e)
-        {
-            // stop the game.
-            StopGame();
-            // refresh UI.
-            pictureBox.Refresh();
-        }
-        /// <summary>
-        /// Method used to stop the worker game-worker threads and restart the game state.
-        /// </summary>
-        private void StopGame()
-        {
-            // stop uiUpdaterWorker.
-            cancelToken.Cancel();
-            // restart game.
-            game.RestartGame();
-        }
-        /// <summary>
         /// Method used to update the controls from the UI after a player's move.
         /// </summary>
         public void UpdateUI()
         {
-            Console.WriteLine("UI update " + game.GetScore(1) + ":" + game.GetScore(2));
             /* update current player and score. */
             currentPlayerLabel.Text = "Current player: " + game.GetCurrentPlayer().GetColor().ToString();
             currentPlayerLabel.Refresh();

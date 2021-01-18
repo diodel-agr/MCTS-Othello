@@ -1,4 +1,5 @@
-﻿using MCTS_Othello.ui;
+﻿using System;
+using MCTS_Othello.ui;
 
 namespace MCTS_Othello.player
 {
@@ -35,6 +36,11 @@ namespace MCTS_Othello.player
         }
 
         public void SetBoard(Board b)
+        {
+            return;
+        }
+
+        public void StopFromPlaying(Board board)
         {
             return;
         }

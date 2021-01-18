@@ -74,5 +74,13 @@ namespace MCTS_Othello.player
                 simulation.SetBoard(b);
             }
         }
+
+        public void StopFromPlaying(Board board)
+        {
+            // set the starting board.
+            simulation.SetBoard(board);
+            // stop the simulation.
+            simulation.GetSimulationResult();
+        }
     }
 }

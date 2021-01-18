@@ -58,5 +58,10 @@ namespace MCTS_Othello.player
         {
             board = new ui.Board(b);
         }
+
+        public void StopFromPlaying(Board board)
+        {
+            return;
+        }
     }
 }

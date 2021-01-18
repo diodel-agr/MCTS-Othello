@@ -2,7 +2,9 @@
 Monte Carlo Tree Search (MCTS) bot for the Othello game.
 
 ## TO DO
+- make sure HCGame::BotThread function exits in any case.
 - simplify IMCTSGame interface.
+- make sure all worker threads stop when closing the app or stopping the game.
 - refator comments.
 - remove commented code.
 - create an enum or something with the color of each player.
@@ -26,3 +28,6 @@ manual Board::AddPiece(p1, p2) afterwards.
 ## DONE
 - make the ui update after bot move automated. Done for all game types.
 - the score does not update after the player places a piece.
+
+## SOMETHING...
+The subscribe method should start the thread which will then update the ui.

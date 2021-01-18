@@ -15,5 +15,6 @@ namespace MCTS_Othello.player
         Piece MakeMove(); /* trb modifica sa intoarca numai Piece[1]. */
         Color GetColor();
         void SetBoard(Board b);
+        void StopFromPlaying(Board board);
     }
 }

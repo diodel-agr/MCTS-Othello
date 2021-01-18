@@ -74,6 +74,7 @@ namespace MCTS_Othello.player.MCTS.simulation
          */
         public void StartSimulation()
         {
+            Console.WriteLine("S-a mai pornit o simulare hihi");
             /* print current board. */
             //board.PrintBoard();
             if (root == null)
@@ -198,49 +199,53 @@ namespace MCTS_Othello.player.MCTS.simulation
         /* methods. */
         private void ThreadSim(object obj)
         {
-            //Console.WriteLine("Thread started simulation.");
+            Console.WriteLine("[RandomSimulation] Thread started simulation.");
             object[] objArr = (object[])obj;
             CancellationTokenSource token = (CancellationTokenSource)(objArr[0]);
             Board b = (Board)(objArr[1]);
             Node cn = (Node)(objArr[2]);
-            /* choose simulation color. */
-            Color rootColor = Color.black;
-            if (cn.X != -1 && b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
+            if (token.IsCancellationRequested == false)
             {
-                rootColor = Color.white;
-            }
-            IExpansion expansion = new SimpleExpansion();
-            int win = 0;
-            int sim = 0;
-            while (token.IsCancellationRequested == false)
-            {
-                //Console.WriteLine("score: " + b.GetScore(1) + " : " + b.GetScore(2));
-                int res = Simulate(token, new Board(b), cn, expansion, rootColor);
-                if (res == -2)
-                {   /* received cancel request while simulating, discard this result. */
-                    break;
-                }
-                else
+                /* choose simulation color. */
+                Color rootColor = Color.black;
+                if (cn.X != -1 && b.pieces[cn.X, cn.Y].owner.GetColor() == Color.black)
                 {
-                    win += res;
-                    sim++;
+                    rootColor = Color.white;
                 }
+                IExpansion expansion = new SimpleExpansion();
+                int win = 0;
+                int sim = 0;
+                while (token.IsCancellationRequested == false)
+                {
+                    //Console.WriteLine("score: " + b.GetScore(1) + " : " + b.GetScore(2));
+                    int res = Simulate(token, new Board(b), cn, expansion, rootColor);
+                    if (res == -2)
+                    {   /* received cancel request while simulating, discard this result. */
+                        break;
+                    }
+                    else
+                    {
+                        win += res;
+                        sim++;
+                    }
+                }
+                //File.WriteAllText("output.txt", "Score " + b.GetScore(1) + ":" + b.GetScore(2) + "||" + win + " wins and " + sim + " simulations.");
+                Console.WriteLine("Score " + b.GetScore(1) + ":" + b.GetScore(2) + "||" + win + " wins and " + sim + " simulations.");
+                //using (StreamWriter sw = File.CreateText("output.txt"))
+                //{
+                //    sw.WriteLine(win + " wins and " + sim + " simulations.");
+                //}
+                //logger.WriteLine(win + " wins and " + sim + " simulations.");
+                /* update node statistics. */
+                mutex.WaitOne();
+                wins += win;
+                visits += sim;
+                mutex.ReleaseMutex();
+                /* free memory. */
+                b.FreePieces();
+                b = null;
             }
-            //File.WriteAllText("output.txt", "Score " + b.GetScore(1) + ":" + b.GetScore(2) + "||" + win + " wins and " + sim + " simulations.");
-            Console.WriteLine("Score " + b.GetScore(1) + ":" + b.GetScore(2) + "||" + win + " wins and " + sim + " simulations.");
-            //using (StreamWriter sw = File.CreateText("output.txt"))
-            //{
-            //    sw.WriteLine(win + " wins and " + sim + " simulations.");
-            //}
-            //logger.WriteLine(win + " wins and " + sim + " simulations.");
-            /* update node statistics. */
-            mutex.WaitOne();
-            wins += win;
-            visits += sim;
-            mutex.ReleaseMutex();
-            /* free memory. */
-            b.FreePieces();
-            b = null;
+            Console.WriteLine("[RandomSimulation] Thread exit.");
         }
         /// <summary>
         /// This method executes the simulation of a game. It decides the statistics (wins and simulations)

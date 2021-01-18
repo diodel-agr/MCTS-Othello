@@ -17,6 +17,8 @@ namespace MCTS_Othello.game
         IMCTSPlayer bot;
         IMCTSPlayer currentPlayer;
         Piece clickedTile;
+
+        Thread worker;
         /// <summary>
         /// List with the current valid moves for a clicked tile.
         /// </summary>
@@ -142,9 +144,21 @@ namespace MCTS_Othello.game
         {
             return board.PlayerHasPossibleMoves(currentPlayer);
         }
-
+        /// <summary>
+        /// Method used to stop the worker thread and refresh the game.
+        /// </summary>
         public void RestartGame()
         {
+            // wait for the worker thread to stop.
+            if (worker != null)
+            {
+                worker.Join();
+            }
+            // get a new board.
+            InitBoard();
+            // stop the bot.
+            bot.StopFromPlaying(board);
+            // refresh the game state.
             Start();
         }
 
@@ -152,7 +166,9 @@ namespace MCTS_Othello.game
         {
             this.state = state;
         }
-
+        /// <summary>
+        /// Method used to se the game state to the starting configuration / state (board).
+        /// </summary>
         public void Start()
         {
             InitBoard();
@@ -215,7 +231,6 @@ namespace MCTS_Othello.game
         /// </summary>
         private void BotThread()
         {
-            //Console.WriteLine("Bot thread started.");
             /* do bot things. */
             Thread.Sleep(BOT_WAIT_TIMEOUT);
             /* get move from bot. */
@@ -257,7 +272,15 @@ namespace MCTS_Othello.game
                 observers.Add(observer);
             }
             // start the thread to get the move from the bot and update the UI.
-            BotThread();
+            worker = new Thread(
+                new ThreadStart(
+                    () => {
+                        Console.WriteLine("[HCGame] Worker thread started.");
+                        BotThread();
+                        Console.WriteLine("[HCGame] Worker thread exit.");
+                    })
+            );
+            worker.Start();
             T value = default(T);
             Refresh(value);
             return new Unsubscriber<T>(observers, observer);
