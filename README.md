@@ -2,6 +2,8 @@
 Monte Carlo Tree Search (MCTS) bot for the Othello game.
 
 ## TO DO
+- MCTS Game restart map does not print initial pieces.
+- some thread remains in execution in the cc game after stop (back propagation thread).
 - make sure HCGame::BotThread function exits in any case.
 - simplify IMCTSGame interface.
 - make sure all worker threads stop when closing the app or stopping the game.
@@ -22,8 +24,6 @@ manual Board::AddPiece(p1, p2) afterwards.
 - human player generates method not implemented exception in subscribe method.
 - create a greedy bot :D
 - parameterize Thread.Sleep() parameters.
-- error in simulation when starting the game after it was stopped.
-- some thread remains in execution in the cc game after stop.
 
 ## DONE
 - make the ui update after bot move automated. Done for all game types.

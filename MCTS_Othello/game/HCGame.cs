@@ -159,7 +159,7 @@ namespace MCTS_Othello.game
             // stop the bot.
             bot.StopFromPlaying(board);
             // refresh the game state.
-            Start();
+            //Start();
         }
 
         public void SetGameState(GameState state)
@@ -225,7 +225,6 @@ namespace MCTS_Othello.game
             }
             return result;
         }
-
         /// <summary>
         /// Function executed by the bot thread.
         /// </summary>

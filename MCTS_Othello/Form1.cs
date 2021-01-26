@@ -112,6 +112,9 @@ namespace MCTS_Othello
                     this.Invoke((MethodInvoker)delegate
                     {
                         pictureBox.Refresh();
+                        // re-initialize the game state.
+                        int gameIdx = gameTypeComboBox.SelectedIndex;
+                        game = GameFactory<int>.Create(gameIdx, botOne, botTwo);
                     });
                 })
             );
