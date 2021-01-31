@@ -22,7 +22,8 @@ namespace MCTS_Othello.player.MCTS.selection
             List<Node> children = root.GetChildren();
             if (children == null || children.Count == 0)
             {
-                throw new MCTSException("[SimpleSelection/Select()] - node has 0 children.");
+                Console.WriteLine("[Selection] No valid moves.");
+                return null;
             }
             double bestScore = ComputeScore(root, children[0].GetWins(), children[0].GetVisits());
             foreach (Node ch in children)

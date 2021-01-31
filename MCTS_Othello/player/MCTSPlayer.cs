@@ -36,6 +36,11 @@ namespace MCTS_Othello.player
             Node simRes = simulation.GetSimulationResult(); /* BACK-PROPAGATE happens in this function. */
             /* select the best next move -> SELECTION. */
             Node bestNode = selection.Select(simRes);
+            if (bestNode == null)
+            {
+                Console.WriteLine("[MCTSPlayer] No valid move");
+                return null;
+            }
             Piece bestPiece = new Piece(bestNode.X, bestNode.Y, this);
             /* advance game state (add a node to the tree) -> EXPANSION and resume SIMULATION. */
             //simulation.StartSimulation(bestPiece);

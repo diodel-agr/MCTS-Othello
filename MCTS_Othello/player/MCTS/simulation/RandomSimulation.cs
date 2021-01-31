@@ -117,6 +117,7 @@ namespace MCTS_Othello.player.MCTS.simulation
          */
         public void StartSimulation(Piece p)
         {
+            Console.WriteLine("S-a mai pornit o simulare(p) hihi");
             if (isSimulating == true)
             {
                 GetSimulationResult();
@@ -175,13 +176,24 @@ namespace MCTS_Othello.player.MCTS.simulation
             else
             {   /* update game state. */
                 bool found = false;
-                foreach (Node ch in root.GetChildren()) // when here a null pointer dereference is thrown, the game is finished, probably the bot won.
+                List<Node> children = root.GetChildren();
+                if (children == null)
                 {
-                    if (ch.X == newPiece.X && ch.Y == newPiece.Y)
+                    Console.WriteLine("Bot has no valid moves!");
+                    return; // game is finished, bot has no valid moves.
+                }
+                for (int i = 0; i < children.Count; i++)
+                {
+                    Node ch = children[i];
+                    if (found == false && ch.X == newPiece.X && ch.Y == newPiece.Y)
                     {
                         root = ch;
                         found = true;
-                        break;
+                        //break;
+                    }
+                    else
+                    {   // release node.
+                        children[i] = null;
                     }
                 }
                 if (found == false)
